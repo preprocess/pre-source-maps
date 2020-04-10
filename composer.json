@@ -1,4 +1,15 @@
 {
+    "name": "pre/source-maps",
+    "description": "Source-map support for custom PHP parsers",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christopher Pitt",
+            "email": "cgpitt@gmail.com",
+            "homepage": "https://assertchris.io",
+            "role": "Developer"
+        }
+    ],
     "scripts": {
         "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests"
     },

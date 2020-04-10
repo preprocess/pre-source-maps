@@ -126,11 +126,8 @@ class FunctionsTest extends TestCase
         $inputFixturePath = __DIR__ . '/fixtures/input.pre';
         $inputPath = __DIR__ . '/fixtures/input-copy.pre';
     
-        // first, make sure the file doesn't already exist
-        exec("rm {$inputPath} > /dev/null");
-
-        // copy the fixture file
-        exec("cp {$inputFixturePath} {$inputPath} > /dev/null");
+        @unlink($inputPath);
+        @copy($inputFixturePath, $inputPath);
 
         $outputFixturePath = __DIR__ . '/fixtures/output-copy.php';
         $outputPath = __DIR__ . '/fixtures/output-copy.php';
@@ -156,4 +153,51 @@ class FunctionsTest extends TestCase
         $this->assertEquals(md5_file($outputPath), md5_file($outputFixturePath));
         $this->assertEquals(md5_file("{$outputPath}.map"), md5_file("{$outputFixturePath}.map"));
     }
+
+    /**
+      * @dataProvider genericStreamConfigProvider
+      */
+    public function testCanLocate(string $inputPath, string $outputPath, int $errorOnLine)
+    {
+        $parser = function(string $code) use ($errorOnLine): string {
+            return str_replace(
+                'THROWER_CODE_HERE',
+                <<<CODE
+                function thrower{$errorOnLine}() {
+                    throw new Exception('hello world');
+                }
+
+                thrower{$errorOnLine}();
+                CODE,
+                $code
+            );
+        };
+
+        \Pre\SourceMaps\map($inputPath, $outputPath, $parser);
+
+        try {
+            require $outputPath;
+        } catch (Throwable $throwable) {
+            $newThrowable = \Pre\SourceMaps\locate($inputPath, $throwable);
+
+            $this->assertEquals($inputPath, $newThrowable->getFile());
+            $this->assertEquals($errorOnLine, $newThrowable->getLine());
+        }
+    }
+
+    public function genericStreamConfigProvider()
+     {
+         return [
+             [
+                __DIR__ . '/fixtures/thrower-input-one.pre',
+                __DIR__ . '/fixtures/thrower-output-one.php',
+                5,
+             ],
+             [
+                __DIR__ . '/fixtures/thrower-input-two.pre',
+                __DIR__ . '/fixtures/thrower-output-two.php',
+                10,
+             ]
+         ];
+     }
 }

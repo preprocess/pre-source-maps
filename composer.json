@@ -1,0 +1,13 @@
+{
+    "scripts": {
+        "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests"
+    },
+    "autoload": {
+        "files": [
+            "source/functions.php"
+        ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.1"
+    }
+}

@@ -1,0 +1,9 @@
+<?php
+
+$handle = fopen($file, 'r');
+
+defer fclose($handle);
+
+while (!feof($handle)) {
+    print fgets($handle);
+}

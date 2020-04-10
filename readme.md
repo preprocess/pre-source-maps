@@ -31,7 +31,7 @@ $newThrowable = \Pre\SourceMaps\locate(
 
 This function changes the `file` and `line` properties of a throwable, so that it reflects where the error happened in the source file. Imagine you had the following superset code:
 
-``php
+```php
 $handle = fopen($file, 'r');
 
 defer fclose($handle);
